@@ -71,6 +71,7 @@ Resources:
 
   S3EventLambda:
     Type: AWS::Serverless::Function
+    DependsOn: S3Bucket
     Properties:
       FunctionName: !Sub s3-sns-handler-${Environment}
       CodeUri: .
