@@ -34,7 +34,7 @@ Resources:
       Properties:
         TopicArn: !Ref SNSTopic
         Protocol: email
-        Endpoint: you@example.com  # REPLACE
+        Endpoint: niicloud4@gmail.com  # REPLACE
 
   LambdaExecutionRole:
     Type: AWS::IAM::Role
