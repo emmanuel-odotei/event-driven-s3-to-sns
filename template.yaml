@@ -69,9 +69,17 @@ Resources:
                   - logs:PutLogEvents
                 Resource: "*"
 
+  S3EventLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Sub s3-sns-handler-${Environment}
+      Action: lambda:InvokeFunction
+      Principal: s3.amazonaws.com
+      SourceArn: !Sub arn:aws:s3:::event-sns-bucket-${Environment}
+
   S3EventLambda:
     Type: AWS::Serverless::Function
-    DependsOn: S3Bucket
+    DependsOn: S3EventLambdaPermission
     Properties:
       FunctionName: !Sub s3-sns-handler-${Environment}
       CodeUri: .
