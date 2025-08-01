@@ -21,7 +21,7 @@ Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub event-bucket-${Environment}
+      BucketName: !Sub event-sns-bucket-${Environment}
     DeletionPolicy: Delete
 
   SNSTopic:
