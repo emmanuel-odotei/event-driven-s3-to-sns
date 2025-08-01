@@ -21,7 +21,7 @@ Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub event-bucket-${Environment}
+      BucketName: !Sub event-sns-bucket-${Environment}
     DeletionPolicy: Delete
 
   SNSTopic:
@@ -34,7 +34,7 @@ Resources:
       Properties:
         TopicArn: !Ref SNSTopic
         Protocol: email
-        Endpoint: you@example.com  # REPLACE
+        Endpoint: niicloud4@gmail.com  # REPLACE
 
   LambdaExecutionRole:
     Type: AWS::IAM::Role
@@ -60,7 +60,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - s3:GetObject
-                Resource: !Sub arn:aws:s3:::event-bucket-${Environment}/*
+                Resource: !Sub arn:aws:s3:::event-sns-bucket-${Environment}/*
 
               - Effect: Allow
                 Action:
@@ -85,6 +85,7 @@ Resources:
       Environment:
         Variables:
           TOPIC_ARN: !Ref SNSTopic
+          EXPECTED_BUCKET: !Sub event-sns-bucket-${Environment}
 
 Outputs:
   S3BucketName:
