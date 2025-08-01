@@ -13,10 +13,19 @@ public class S3EventHandler implements RequestHandler<S3EventNotification, Strin
     
     @Override
     public String handleRequest(S3EventNotification event, Context context) {
+        
         event.getRecords().forEach( data -> {
+            
+            String expectedBucket = System.getenv("EXPECTED_BUCKET");
+            
             String bucket = data.getS3().getBucket().getName();
             String key = data.getS3().getObject().getKey();
             String message = "New file uploaded: " + bucket + "/" + key;
+            
+            if (!bucket.equals(expectedBucket)) {
+                System.out.println("Ignoring event from unrelated bucket");
+                return;
+            }
             
             snsClient.publish(new PublishRequest()
                     .withTopicArn(System.getenv("TOPIC_ARN"))
