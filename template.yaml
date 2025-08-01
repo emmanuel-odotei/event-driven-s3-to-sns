@@ -94,7 +94,7 @@ Resources:
       Environment:
         Variables:
           TOPIC_ARN: !Ref SNSTopic
-          EXPECTED_BUCKET: !Ref S3Bucket
+          EXPECTED_BUCKET: !Sub event-sns-bucket-${Environment}
 
 Outputs:
   S3BucketName:
