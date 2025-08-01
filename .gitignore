@@ -1,0 +1,61 @@
+# Java & Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven wrapper
+.mvn/
+!/.mvn/wrapper/maven-wrapper.jar
+mvnw
+mvnw.cmd
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+out/
+
+# Eclipse
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.log
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Linux
+*~
+
+# SAM build artifacts
+.sam/
+.aws-sam/
+
+# SAM deployment packaged templates
+packaged.yaml
+packaged.yml
+
+# AWS CLI cache
+.aws/
+
+# GitHub Actions secrets (never commit your .env or secrets)
+.env
+.env.*
+
+# Test coverage reports
+coverage/
+jacoco.exec
+
+# Local files
+*.swp
+*.swo
+
+# AWS credentials (if mistakenly placed)
+credentials

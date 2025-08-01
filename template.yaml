@@ -1,0 +1,104 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  event-driven-s3-to-sns
+  Sample SAM Template for event-driven-s3-to-sns
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 20
+    MemorySize: 512
+    Runtime: java17
+
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues: [dev, prod]
+    Default: dev
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub event-bucket-${Environment}
+    DeletionPolicy: Delete
+
+  SNSTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: !Sub s3-sns-topic-${Environment}
+
+  EmailSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        TopicArn: !Ref SNSTopic
+        Protocol: email
+        Endpoint: you@example.com  # REPLACE
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub s3-sns-lambda-role-${Environment}
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaAccessPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sns:Publish
+                Resource: !Ref SNSTopic
+
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource: !Sub arn:aws:s3:::event-bucket-${Environment}/*
+
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+
+  S3EventLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub s3-sns-handler-${Environment}
+      CodeUri: .
+      Handler: handlers.S3EventHandler::handleRequest
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Events:
+        S3Trigger:
+          Type: S3
+          Properties:
+            Bucket: !Ref S3Bucket
+            Events: s3:ObjectCreated:*
+      Environment:
+        Variables:
+          TOPIC_ARN: !Ref SNSTopic
+
+Outputs:
+  S3BucketName:
+    Description: "S3 Bucket used for file uploads"
+    Value: !Ref S3Bucket
+
+  SNSTopicArn:
+    Description: "SNS Topic ARN for email notifications"
+    Value: !Ref SNSTopic
+
+  LambdaFunctionName:
+    Description: "Lambda function triggered by S3 upload"
+    Value: !Ref S3EventLambda
+
+  LambdaExecutionRoleArn:
+    Description: "IAM role used by the Lambda function"
+    Value: !GetAtt LambdaExecutionRole.Arn
